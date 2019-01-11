@@ -1,0 +1,88 @@
+ TO SETUP NODEJS --EXPRESS ON Ubuntu EC2 Instance
+
+1. Create Ubuntu 18.04 EC2 instance as:
+Ubuntu Server 18.04 LTS (HVM), SSD Volume Type - ami-0ac019f4fcb7cb7e6 (64-bit x86) / 
+Why Ubuntu? --This is the free Linux distro which is loaded with the latest tools and updated repository. So most of the things work smoothly here.
+
+Select this specific 18.04 version.
+
+2. Connect to ubuntu instance.
+    To connect to the ec2 instance we have two methods:
+Using putty if on windows.
+Using direct ssh command if we are on linux
+Syntax for direct ssh is  
+
+ssh -i "cracker.pem" ubuntu@ec2-52-14-252-174.us-east-2.compute.amazonaws.com
+
+3. Once Connected use below commands:
+
+# sudo -s         --To enter into the root mode.
+# apt update        --To update the repository        
+# apt upgrade        --To upgrade the upgradable packages if any.
+#apt install nodejs    --To install nodejs
+#  apt install npm    --To Install NodeJS
+# mkdir code        --Create Directory Code
+
+# cd code        --To enter into the code folder
+//Some Kali showing error after below command.
+# npm install express-generator -g --save    --To install express 
+This below command will create files inside the code folder.
+# express -v hbs                 --To install hbs module in the code directory
+# npm install                     --To install dependencies.
+# npm install nodemon -g --save        --To install nodemon(May Not work)
+# npm install mysql --save            --To install mysql for npm
+*Check Package.json  using “cat Package.json” whether mysql is listed in there or not.
+# npm start        --To check whether express server is running or not
+
+Now from the aws console -->Services-->EC2 instances→ select your instance →
+Then from the description click on the link(launch-wizard-x) in front of the Security Groups and then set the inbound rules:
+
+
+8
+Click on Edit and choose All Traffic and then save.
+
+
+**Note: To check whether the npm is ru⅞nning properly copy your public-dns or public ip and put that in your browser as 
+http://3.85.52.152:3000/
+This should display Welcome Express page.
+
+
+Copy Files from windows to EC2 Instance
+pscp -i "D:\Tools\AWS\amzskd.ppk"  "D:\Tools\AWS\yourfile.txt" "ubuntu@3.85.52.152:"
+
+
+Copy Files from Linux to EC2 Instance
+Command to copy files from Linux to Amazon instance: 
+# scp -r -i "amzskd.pem" codeskd/  ec2-user@18.234.49.255:
+
+This will copy the file to your home directory. 
+
+
+///////////////////////////////TO PREPARE MYSQL DB SERVER ON Ubuntu EC2 Instance/////////////////
+
+#apt install mysql-server
+#service mysql start
+# mysql
+
+MySql Commands:
+>show databases;
+>GRANT ALL PRIVILEGES ON *.* TO 'anony'@'localhost' IDENTIFIED BY 'anony123';
+> Ctrl-C -- exit!
+
+# mysql -u anony -p hit        -- Enter and enter password as provided in the above command anony123 in this case. 
+> create database node;
+> use node;
+> create table users(ID int AUTO_INCREMENT, Username varchar(20) not null, Password varchar(20) not null, PRIMARY KEY(ID));
+
+>insert into users(Username, Password) values ('admin', 'admin');
+> select * from users;
+> alter table users add(Firstname varchar(20) not null, Lastname varchar(20) not null, Occupation varchar(20) not null);
+>alter table users add(Email varchar(50) not null);
+> update users set Firstname = 'Shanti Kumar', Lastname = '', Occupation='Student', Email='shanti.18704@sscbs.du.ac.in';
+
+
+
+More NPM commands:
+To setup PM2:
+#pm2 start app.jscode# npm install pm2 –g
+
