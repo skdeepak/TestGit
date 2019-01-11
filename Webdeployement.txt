@@ -1,0 +1,356 @@
+error 404????????????????????????????  --- Check routes in the app.js and also check the file names folder names
+REST is just an Architecture.. Widely used for easy to handle api creation.
+
+As per the REST (REpresentational “State” Transfer) architecture, the server does not store any state about the client session on the server side. This restriction is called Statelessness. Each request from the client to server must contain all of the information necessary to understand the request, and cannot take advantage of any stored context on the server. Session state is therefore kept entirely on the client. client is responsible for storing and handling all application state related information on client side.
+Link to above explanation and other info-->https://restfulapi.net/statelessness/
+
+Express Routing:
+Read about express module from below link
+https://expressjs.com/en/guide/routing.html
+https://expressjs.com/en/guide/writing-middleware.html
+
+PRACTICAL -- Creating Rest API, with GET Method
+
+create a file with basic hello world output using GET and save it in the routes folder inside the code->routes folder: code/routes/index2.js
+
+var express = require('express')
+var app = express.Router()
+
+// respond with "hello world" when a GET request is made to the homepage
+app.get('/', function (req, res) {
+  res.send('hello world')
+})
+module.exports = app;
+
+Once we save this file now, update your app.js file as:
+///Here we are adding one more route called index2
+
+var index2Router = require('./routes/index2');
+
+AND
+
+app.use('/ind2', index2Router); 
+
+
+Once we are done with the changes in app.js file now try running npm start and check in browser by typing public ip of instance and :port number i.e 52.14.252.174:3000/ind2 
+That’s it, It’s our first api using get method. Similarly we can try more codes..for POST.
+
+index2.js
+
+var express = require('express')
+var app = express.Router()
+
+// respond with "hello world" when a GET request is made to the homepage
+app.get('/', function (req, res) {
+  res.send('hello world')
+})
+
+module.exports = app;
+
+
+
+APP.js
+
+var createError = require('http-errors');
+var express = require('express');
+var path = require('path');
+var cookieParser = require('cookie-parser');
+var logger = require('morgan');
+
+var indexRouter = require('./routes/index');
+var usersRouter = require('./routes/users');
+var index2Router = require('./routes/index2');    //////////////////////////////This line is added///////////////////
+var app = express();
+
+// view engine setup
+app.set('views', path.join(__dirname, 'views'));
+app.set('view engine', 'hbs');
+
+app.use(logger('dev'));
+app.use(express.json());
+app.use(express.urlencoded({ extended: false }));
+app.use(cookieParser());
+app.use(express.static(path.join(__dirname, 'public')));
+
+app.use('/test', indexRouter);
+app.use('/ind2', index2Router);                  //////////////////////////////This line is added///////////////////
+app.use('/users', usersRouter);
+
+// catch 404 and forward to error handler
+app.use(function(req, res, next) {
+  next(createError(404));
+});
+
+// error handler
+app.use(function(err, req, res, next) {
+  // set locals, only providing error in development
+  res.locals.message = err.message;
+  res.locals.error = req.app.get('env') === 'development' ? err : {};
+
+  // render the error page
+  res.status(err.status || 500);
+  res.render('error');
+});
+module.exports = app;
+
+
+
+
+
+PRACTICAL -- Creating Rest API, with POST Method
+
+Create database.js file if not already there in the config folder inside the code folder as:
+database.js
+
+var Database =
+{
+host            : 'localhost',
+database        :  'node',            //Create database node if not already created
+user            :  'deepak',        //Use Your db user
+password        :  'deepak123'   //Use Your db user’s password
+};
+module.exports= Database;
+
+Now go to MY SQL and follow these commands: 
+>GRANT ALL PRIVILEGES ON *.* TO 'deepak'@'localhost' IDENTIFIED BY 'deepak123'; 
+>create database node;
+> use node;
+> create table users(ID int AUTO_INCREMENT, Username varchar(20) not null, Password varchar(20) not null, PRIMARY KEY(ID));
+>insert into users(Username, Password) values ('admin', 'admin');
+> select * from users;
+> alter table users add(Firstname varchar(20) not null, Lastname varchar(20) not null, Occupation varchar(20) not null);
+>alter table users add(Email varchar(50) not null);
+> update users set Firstname = 'Shanti Kumar', Lastname = 'Deepak', Occupation='Student', Email='shanti.18704@sscbs.du.ac.in';
+
+
+Now create index3.js file in the code/routes/ folder as:
+index3.js
+
+
+var express = require('express');  //using module express
+var router = express.Router();        //creating object of express.Router type
+var DataBase = require('../config/database.js'); //using module express
+var mysql = require('mysql');  //using mysql module of npm
+var con = mysql.createConnection(DataBase); //creating  database connection 
+
+// POST method route
+router.post('/', function (req, res) {
+  res.send('POST request to the homepage')
+})
+module.exports = router;
+
+Do same changes in app.js add another route and check in your browser whether it is showing message POST request to the homepage.
+
+Now we will do little advance and will create a database connection and will communicate to the database using a basic user registration page. 
+For that we will create a .hbs view in the views folder and  will modify the index3.js in routes later.
+
+login.hbs
+
+<!DOCTYPE html>
+<html>
+<head>
+</head>
+<body>
+
+<h2>Modal Login Form</h2>
+
+<button onclick="document.getElementById('id01').style.display='block'" style="width:auto;">Login</button>
+
+<div id="id01" class="modal">
+ 
+  <form class="modal-content animate" action="/ind3/userValid" method="post">
+    <div class="imgcontainer">
+      <span onclick="document.getElementById('id01').style.display='none'" class="close" title="Close Modal">&times;</span>
+      <img src="img_avatar2.png" alt="Avatar" class="avatar">
+    </div>
+
+    <div class="container">
+      <label for="uname"><b>Username</b></label>
+      <input type="text" placeholder="Enter Username" name="uname" required>
+
+      <label for="psw"><b>Password</b></label>
+      <input type="password" placeholder="Enter Password" name="psw" required>
+        
+      <button type="submit">Login</button>
+      <label>
+        <input type="checkbox" checked="checked" name="remember"> Remember me
+      </label>
+    </div>
+
+    <div class="container" style="background-color:#f1f1f1">
+      <button type="button" onclick="document.getElementById('id01').style.display='none'" class="cancelbtn">Cancel</button>
+      <span class="psw">Forgot <a href="#">password?</a></span>
+    </div>
+  </form>
+</div>
+<script>
+// Get the modal
+var modal = document.getElementById('id01');
+
+// When the user clicks anywhere outside of the modal, close it
+window.onclick = function(event) {
+    if (event.target == modal) {
+        modal.style.display = "none";
+    }
+}
+</script>
+
+</body>
+</html>
+
+
+Index3.js
+
+var express = require('express');
+var router = express.Router();
+var DataBase = require('../config/database.js');
+var mysql = require('mysql');
+var con = mysql.createConnection(DataBase);
+/* GET home page. */
+router.get('/', function(req, res, next) {    
+  res.render('login');
+});
+
+router.post('/userValid', function(req, res, next) {    
+  console.log(req.body)
+  data=req.body;
+  var username=data["uname"]; //xss //SQL
+  var password=data["psw"]
+  con.connect(function(err)
+  {
+    con.query('SELECT * from users where Username = ? and password =  ?',[username,password],function(err,result){
+      if (err) throw err;
+       if (result.length > 0) {
+          firstname=[]
+          lastname=[]
+          ocType=[]
+          finl=[]
+          for(let index = 0; index<result.length; index++)
+          {
+            temp=[]
+            temp.push(result[index]["Firstname"])
+            temp.push(result[index]["Lastname"])
+            temp.push(result[index]["Occupation"])
+            finl.push(temp);
+
+           }
+
+        //res.send(result)
+        res.render('dash',{finl})
+        console.log(finl);
+       }
+       else
+       {
+        res.render('login');
+       }
+    })
+  })
+  //res.send("Page Working")
+});
+
+module.exports = router;
+
+app.js
+
+var createError = require('http-errors');
+var express = require('express');
+var path = require('path');
+var cookieParser = require('cookie-parser');
+var logger = require('morgan');
+
+var indexRouter = require('./routes/index');
+var usersRouter = require('./routes/users');
+var index2Router = require('./routes/index2');
+var index3Router = require('./routes/posttest');
+var app = express();
+
+// view engine setup
+app.set('views', path.join(__dirname, 'views'));
+app.set('view engine', 'hbs');
+
+app.use(logger('dev'));
+app.use(express.json());
+app.use(express.urlencoded({ extended: false }));
+app.use(cookieParser());
+app.use(express.static(path.join(__dirname, 'public')));
+
+app.use('/test', indexRouter);
+app.use('/ind2', index2Router);
+app.use('/users', usersRouter);
+app.use('/ind3', index3Router);
+
+// catch 404 and forward to error handler
+app.use(function(req, res, next) {
+  next(createError(404));
+});
+
+// error handler
+app.use(function(err, req, res, next) {
+  // set locals, only providing error in development
+  res.locals.message = err.message;
+  res.locals.error = req.app.get('env') === 'development' ? err : {};
+
+  // render the error page
+  res.status(err.status || 500);
+  res.render('error');
+});
+
+module.exports = app;
+
+dash.hbs
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <title>Page</title>
+    <link href = "https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.1.1/css/bootstrap.css" rel="stylesheet" type="text/css">
+    <link href = "https://cdn.datatables.net/1.10.19/css/dataTables.bootstrap4.min.css" rel="stylesheet" type="text/css">
+
+<script type="text/javascript" charset="utf8" src="https://code.jquery.com/jquery-3.3.1.js"></script>
+<script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.10.19/js/jquery.dataTables.min.js"></script>
+<script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.10.19/js/dataTables.bootstrap4.min.js"></script>
+
+</head>
+
+
+<body>
+    <div id="test" class="container-fluid">
+        <h1 class="text-danger">
+            Welcome to the dashboard!
+            <small class="text-muted">{{App}}</small>
+        </h1>
+        <div id="Fail">
+            <table id="example" class="table table-striped table-bordered" style="width:100%">
+                <thead>
+                    <tr>
+                        <th align="center">First Name</th>
+                        <th align="center">Last Name</th>
+                        <th align="center">Occupation Type</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {{#each finl}}
+                    <tr>
+                        {{#each this}}
+                        <td align="left">{{this}}</td>
+                     {{/each}}
+
+                 </tr>
+                 {{/each}}
+
+<script type="text/javascript">
+
+$(document).ready(function() {
+    $('#example').DataTable();
+} );
+
+</script>
+
+                </tbody>
+            </table>
+        </div>
+    </div>
+</body>
+
+</html>u
